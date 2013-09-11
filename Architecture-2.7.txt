@@ -1,0 +1,76 @@
+Architecture V2 7/22/13
+funnybot
+
+gatekeeper - Controls all threads and data-passes
+
+
+watcher - watches threads created by gatekeeper for keep-alive signal, terminates any threads that hang too long
+
+
+core - contains core network functionality
+  
+  network - opens and handles port interaction
+  listener - listens for incoming data and hands it off to gatekeeper
+  sender - sends data from gatekeeper to server
+  funnydata - object for storing passed data
+  funnydict - contains built-in funnybot variables
+  funnybot - contains global functions for joining/leaving/quitting
+  funnylog - stores various logs such as error, general or room logs
+
+
+modules - contains modules that parse ALL data (Note: modules have a standard weight of 10, lower weights go first,
+  negative weights only run on request of another module or function. A module has the option to mark data as 
+  ‘processed’ which will cause the data NOT to move on to the next module, otherwise it will proceed to the next 
+  module until all modules have seen the data) (weight,marks as processed)
+  
+    pong - module responsible for sending pong response to server (0,true)
+    regex - module responsible for performing regex operations (10,false)
+    linkinfo - module responsible for following links and providing info (10, false)
+    autoop - module responsible for automatically op-ing people in rooms (10,false)
+    autojoin - module responsible for automatically (re)joining rooms (10,false)
+    autovar - automatically tries to convert unknown keywords to user vars (-1,true)
+    keyword - runs function associated with keyword, passes keyword to autovar if unknown keyword. (2,true)
+    ignore - ignores certain users (1,true)
+    permissions - grants users permission to use specific functions (-1,false)
+
+
+functions - contains modules that respond to a keyword (ex. if ?? is the marker then ??time would run a function
+  that has registered time as a keyword)
+    
+    time - registers the ‘time’ keyword, responds with the current server time
+    var - stores/gets/deletes user variables
+    setkey - changes the default marker for that room (or globally)
+    help - interactive help that explains modules/functions/syntax. Every module/function should add to the global
+      help dictionary information about how they function.
+    permissions - grants/denies permissions to users
+    reload - reloads modules/functions/settings/dictionaries/variables. Also loads new/added modules/functions
+    joke - tells a joke from the joke dictionary
+
+
+settings - contains custom settings for funnybot
+  
+  network - network-connection related settings
+  common - general settings such as the current keyword(s) and how much of a scrollback to save and if it should log.
+  modules
+    autojoin - provides a list of rooms to automatically join
+    autoop - provides a list of users to auto-op globally
+    regex - enable/disable globally
+    ignore - global ignore list
+    permissions - stores global user permissions
+    joke - stores global funnybot jokes
+  room
+    roomname - settings specific to a room, such as disable specific modules or autoop certain people
+      modules - room-specific module settings, overrides global
+        autoop - list of users to auto-op in a specific room
+        regex - enabled/disabled in a specific room
+        ignore - room-specific ignore list
+        permissions - stores room-specific user permissions
+        joke - stores room-specific “inside” jokes
+  userdict - stores user-provided variable data
+  
+  
+logs
+  error - contains files with error logs
+  general - contains files with general notifications
+  room - contains room-specific logs
+  roomname - contains logs for a specific room
